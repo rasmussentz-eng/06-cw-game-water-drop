@@ -14,6 +14,15 @@
         <div class="score-panel">
             <div class="score">Score: <span id="score">0</span></div>
             <div class="timer">Time: <span id="time">30</span>s</div>
+            <div class="goal">Goal: <span id="goal">20</span></div>
+            <div class="mode-group">
+                <label for="difficulty-select" class="mode-label">Mode</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
             <div class="button-group">
                 <button id="start-btn">Start Game</button>
                 <button id="reset-btn" class="hidden">Reset Game</button>
@@ -21,6 +30,13 @@
         </div>
         <div id="message" class="message">Press Start to begin.</div>
         <div id="game-container"></div>
+        <footer class="site-footer">
+            <p>Support clean water projects around the world.</p>
+            <div class="footer-links">
+                <a href="https://www.charitywater.org" target="_blank" rel="noopener noreferrer">charity: water</a>
+                <a href="https://www.charitywater.org/donate" target="_blank" rel="noopener noreferrer">Donate</a>
+            </div>
+        </footer>
     </div>
     
     <script src="script.js"></script>

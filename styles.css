@@ -30,7 +30,7 @@ body {
     align-items: center;
     min-height: 100vh;
     background: linear-gradient(180deg, #e8f8ff 0%, #ffffff 100%);
-    font-family: Arial, sans-serif;
+    font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
     padding: 20px;
 }
 
@@ -62,10 +62,31 @@ body {
 }
 
 .score,
-.timer {
+.timer,
+.goal {
     font-size: 22px;
     font-weight: 700;
     color: #0f2e60;
+}
+
+.mode-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f2e60;
+    font-weight: 700;
+}
+
+.mode-label {
+    font-size: 16px;
+}
+
+#difficulty-select {
+    border: 1px solid rgba(46, 157, 247, 0.28);
+    border-radius: 999px;
+    padding: 8px 12px;
+    color: #0f2e60;
+    background-color: #ffffff;
 }
 
 .button-group {
@@ -130,6 +151,39 @@ body {
     text-align: center;
     font-size: 18px;
     line-height: 1.4;
+}
+
+.site-footer {
+    width: 100%;
+    padding: 16px 18px;
+    background-color: #ffffff;
+    border: 1px solid rgba(46, 157, 247, 0.18);
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(35, 87, 148, 0.08);
+}
+
+.site-footer p {
+    margin-bottom: 8px;
+    color: #0f2e60;
+    font-weight: 700;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #2e9df7;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: #159a48;
 }
 
 .water-drop {
@@ -202,9 +256,15 @@ body {
     }
 
     .score,
-    .timer {
+    .timer,
+    .goal {
         width: 100%;
         text-align: center;
+    }
+
+    .mode-group {
+        justify-content: center;
+        width: 100%;
     }
 
     .button-group {

@@ -20,18 +20,120 @@ var timeDisplay = document.getElementById("time");
 var messageDisplay = document.getElementById("message");
 var startButton = document.getElementById("start-btn");
 var resetButton = document.getElementById("reset-btn");
+var difficultySelect = document.getElementById("difficulty-select");
+var goalDisplay = document.getElementById("goal");
+var currentDifficulty = "normal";
+var scoreGoal = 20;
+var milestoneMessages = [
+  { threshold: 5, text: "Halfway there — keep going!" },
+  { threshold: 10, text: "Great job — you are on a roll!" },
+  { threshold: 15, text: "You are close to winning!" }
+];
+var milestoneFlags = {};
+var audioContext = null;
+
+var difficultyModes = {
+  easy: { label: "Easy", time: 45, goal: 10, spawnRate: 1400, dropSpeed: 5.2 },
+  normal: { label: "Normal", time: 30, goal: 20, spawnRate: 1000, dropSpeed: 4 },
+  hard: { label: "Hard", time: 20, goal: 30, spawnRate: 700, dropSpeed: 2.8 }
+};
 
 startButton.addEventListener("click", startGame);
 resetButton.addEventListener("click", resetGame);
+difficultySelect.addEventListener("change", updateDifficultySetting);
+
+function updateDifficultySetting() {
+  currentDifficulty = difficultySelect.value;
+  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
+  scoreGoal = config.goal;
+  timeLeft = config.time;
+  updateScoreGoal();
+  updateTimerDisplay();
+
+  if (!gameRunning) {
+    messageDisplay.textContent = "Mode set to " + config.label + ". Press Start to begin.";
+  }
+}
+
+function updateScoreGoal() {
+  goalDisplay.textContent = scoreGoal;
+}
+
+function checkMilestones() {
+  if (!gameRunning) {
+    return;
+  }
+
+  for (var i = 0; i < milestoneMessages.length; i++) {
+    var milestone = milestoneMessages[i];
+    if (score >= milestone.threshold && !milestoneFlags[milestone.threshold]) {
+      milestoneFlags[milestone.threshold] = true;
+      messageDisplay.textContent = milestone.text;
+      playSound("milestone");
+      break;
+    }
+  }
+}
+
+function playSound(type) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  var oscillator = audioContext.createOscillator();
+  var gainNode = audioContext.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  var frequency = 440;
+  if (type === "collect") {
+    frequency = 660;
+  } else if (type === "bad") {
+    frequency = 220;
+  } else if (type === "win") {
+    frequency = 880;
+  } else if (type === "lose") {
+    frequency = 330;
+  } else if (type === "milestone") {
+    frequency = 540;
+  }
+
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+  gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.2);
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 0.2);
+}
+
+var initialConfig = difficultyModes[currentDifficulty] || difficultyModes.normal;
+scoreGoal = initialConfig.goal;
+timeLeft = initialConfig.time;
+updateScoreGoal();
+updateTimerDisplay();
 
 function startGame() {
   if (gameRunning) {
     return;
   }
 
+  currentDifficulty = difficultySelect.value;
+  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
+  scoreGoal = config.goal;
+  timeLeft = config.time;
+  milestoneFlags = {};
+  updateScoreGoal();
+
   gameRunning = true;
   score = 0;
-  timeLeft = 30;
   updateScore();
   updateTimerDisplay();
   messageDisplay.textContent = "Catch the clean drops and avoid the red ones.";
@@ -39,9 +141,12 @@ function startGame() {
   startButton.disabled = true;
   resetButton.classList.add("hidden");
 
-  dropMaker = setInterval(createDrop, 1000);
+  clearInterval(dropMaker);
+  clearInterval(timerId);
+  dropMaker = setInterval(createDrop, config.spawnRate);
   timerId = setInterval(updateTimer, 1000);
   createDrop();
+  playSound("start");
 }
 
 function updateTimer() {
@@ -63,6 +168,7 @@ function updateTimer() {
 
 function updateScore() {
   scoreDisplay.textContent = score;
+  checkMilestones();
 }
 
 function updateTimerDisplay() {
@@ -86,12 +192,15 @@ function endGame() {
 }
 
 function showEndMessage() {
-  var messageList = score >= 20 ? winMessages : loseMessages;
+  var messageList = score >= scoreGoal ? winMessages : loseMessages;
   var randomIndex = Math.floor(Math.random() * messageList.length);
   messageDisplay.textContent = messageList[randomIndex];
 
-  if (score >= 20) {
+  if (score >= scoreGoal) {
     createCelebration();
+    playSound("win");
+  } else {
+    playSound("lose");
   }
 }
 
@@ -113,7 +222,11 @@ function resetGame() {
   timerId = null;
   gameRunning = false;
   score = 0;
-  timeLeft = 30;
+  milestoneFlags = {};
+  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
+  timeLeft = config.time;
+  scoreGoal = config.goal;
+  updateScoreGoal();
   updateScore();
   updateTimerDisplay();
   messageDisplay.textContent = "Press Start to begin.";
@@ -127,6 +240,7 @@ function createDrop() {
     return;
   }
 
+  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
   var drop = document.createElement("div");
   var isBadDrop = Math.random() < 0.2;
   drop.className = "water-drop " + (isBadDrop ? "bad-drop" : "good-drop");
@@ -142,7 +256,7 @@ function createDrop() {
   var xPosition = Math.random() * maxX;
   drop.style.left = xPosition + "px";
   drop.style.top = "-80px";
-  drop.style.animationDuration = "4s";
+  drop.style.animationDuration = config.dropSpeed + "s";
 
   drop.addEventListener("click", function() {
     if (!gameRunning) {
@@ -151,8 +265,10 @@ function createDrop() {
 
     if (isBadDrop) {
       score = Math.max(0, score - 1);
+      playSound("bad");
     } else {
       score = score + 1;
+      playSound("collect");
     }
 
     updateScore();
