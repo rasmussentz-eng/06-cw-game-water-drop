@@ -1,0 +1,227 @@
+/* Charity: water Brand Colors & Fonts
+
+Primary Colors:
+- Yellow:     #FFC907
+- Blue:       #2E9DF7
+
+Secondary Colors:
+- Light Blue: #8BD1CB
+- Green:      #4FCB53
+- Orange:     #FF902A
+- Red:        #F5402C
+- Dark Green: #159A48
+- Pink:       #F16061
+
+Fonts:
+- Proxima Nova
+- Avenir
+
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #e8f8ff 0%, #ffffff 100%);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.game-wrapper {
+    width: min(100%, 920px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.logo {
+    width: 240px;
+    max-width: 100%;
+}
+
+.score-panel {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px;
+    background-color: #ffffff;
+    border-radius: 14px;
+    border: 1px solid rgba(46, 157, 247, 0.18);
+    box-shadow: 0 10px 24px rgba(35, 87, 148, 0.08);
+}
+
+.score,
+.timer {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f2e60;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#start-btn,
+#reset-btn {
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: background-color 0.2s ease;
+}
+
+#start-btn {
+    background-color: #ffc907;
+    color: #0f2e60;
+}
+
+#start-btn:hover {
+    background-color: #ffdb52;
+}
+
+#reset-btn {
+    background-color: #2e9df7;
+    color: #ffffff;
+}
+
+#reset-btn:hover {
+    background-color: #1f84e5;
+}
+
+.hidden {
+    display: none;
+}
+
+#game-container {
+    width: 100%;
+    height: 580px;
+    max-height: calc(100vh - 260px);
+    background-color: #d8f1ff;
+    border-radius: 20px;
+    border: 2px solid rgba(46, 157, 247, 0.24);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 6px 18px rgba(46, 157, 247, 0.12);
+}
+
+.message {
+    width: 100%;
+    min-height: 50px;
+    padding: 14px 16px;
+    background-color: rgba(255, 201, 7, 0.14);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 201, 7, 0.28);
+    color: #0f2e60;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.water-drop {
+    position: absolute;
+    border-radius: 50%;
+    animation: dropFall linear forwards;
+    transform-origin: center;
+    cursor: pointer;
+    box-shadow: 0 10px 18px rgba(16, 63, 116, 0.16);
+}
+
+.water-drop:hover {
+    transform: scale(1.05);
+}
+
+.water-drop.good-drop {
+    background-color: #2e9df7;
+}
+
+.water-drop.bad-drop {
+    background-color: #f5402c;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: confettiRise 4s ease-out forwards;
+}
+
+.game-title {
+    color: #0f2e60;
+    font-size: 44px;
+    text-align: center;
+}
+
+.game-tagline {
+    color: #225683;
+    font-size: 18px;
+    text-align: center;
+    max-width: 680px;
+}
+
+@keyframes dropFall {
+    from {
+        transform: translateY(-100px);
+    }
+    to {
+        transform: translateY(700px);
+    }
+}
+
+@keyframes confettiRise {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-180px) translateX(var(--confetti-x, 0px)) scale(0.6);
+    }
+}
+
+@media (max-width: 720px) {
+    .score-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .score,
+    .timer {
+        width: 100%;
+        text-align: center;
+    }
+
+    .button-group {
+        justify-content: center;
+        width: 100%;
+    }
+
+    #game-container {
+        height: 55vh;
+    }
+
+    .game-title {
+        font-size: 36px;
+    }
+
+    .game-tagline {
+        font-size: 16px;
+    }
+}
+
