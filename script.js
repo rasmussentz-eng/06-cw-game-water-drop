@@ -47,12 +47,37 @@ function updateDifficultySetting() {
   var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
   scoreGoal = config.goal;
   timeLeft = config.time;
-  updateScoreGoal();
-  updateTimerDisplay();
+  resetGameBoard("Mode set to " + config.label + ". Press Start to begin.");
+}
 
-  if (!gameRunning) {
-    messageDisplay.textContent = "Mode set to " + config.label + ". Press Start to begin.";
+function resetGameBoard(messageText) {
+  clearInterval(dropMaker);
+  clearInterval(timerId);
+  dropMaker = null;
+  timerId = null;
+  gameRunning = false;
+  score = 0;
+  milestoneFlags = {};
+  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
+  timeLeft = config.time;
+  scoreGoal = config.goal;
+  updateScoreGoal();
+  updateScore();
+  updateTimerDisplay();
+  updateMessage(messageText || "Press Start to begin.");
+  startButton.disabled = false;
+  resetButton.classList.add("hidden");
+  removeAllDrops();
+}
+
+function updateMessage(text, type) {
+  messageDisplay.className = "message";
+  if (type === "success") {
+    messageDisplay.classList.add("success");
+  } else if (type === "warning") {
+    messageDisplay.classList.add("warning");
   }
+  messageDisplay.textContent = text;
 }
 
 function updateScoreGoal() {
@@ -136,7 +161,7 @@ function startGame() {
   score = 0;
   updateScore();
   updateTimerDisplay();
-  messageDisplay.textContent = "Catch the clean drops and avoid the red ones.";
+  updateMessage("Catch the clean drops and avoid the red ones.");
 
   startButton.disabled = true;
   resetButton.classList.add("hidden");
@@ -194,9 +219,10 @@ function endGame() {
 function showEndMessage() {
   var messageList = score >= scoreGoal ? winMessages : loseMessages;
   var randomIndex = Math.floor(Math.random() * messageList.length);
-  messageDisplay.textContent = messageList[randomIndex];
+  var isWin = score >= scoreGoal;
+  updateMessage(messageList[randomIndex], isWin ? "success" : "warning");
 
-  if (score >= scoreGoal) {
+  if (isWin) {
     createCelebration();
     playSound("win");
   } else {
@@ -216,23 +242,7 @@ function removeAllDrops() {
 }
 
 function resetGame() {
-  clearInterval(dropMaker);
-  clearInterval(timerId);
-  dropMaker = null;
-  timerId = null;
-  gameRunning = false;
-  score = 0;
-  milestoneFlags = {};
-  var config = difficultyModes[currentDifficulty] || difficultyModes.normal;
-  timeLeft = config.time;
-  scoreGoal = config.goal;
-  updateScoreGoal();
-  updateScore();
-  updateTimerDisplay();
-  messageDisplay.textContent = "Press Start to begin.";
-  startButton.disabled = false;
-  resetButton.classList.add("hidden");
-  removeAllDrops();
+  resetGameBoard("Press Start to begin.");
 }
 
 function createDrop() {
